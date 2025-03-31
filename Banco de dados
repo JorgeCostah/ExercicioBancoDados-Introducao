@@ -1,0 +1,135 @@
+CREATE TABLE clientes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+  	email TEXT UNIQUE,
+    idade INTEGER
+);
+-------------------------------------------------------------------------------------------
+INSERT INTO clientes (nome, email, idade) VALUES ('Juan', 'Juan@gmail.com', 22);
+INSERT INTO clientes (nome, email, idade) VALUES ('Carlos', 'Carlos@gmail.com', 21);
+INSERT INTO clientes (nome, email, idade) VALUES ('Mario', 'Mario@gmail.com', 18);
+INSERT INTO clientes (nome, email, idade) VALUES ('Gabriele', 'Gabriele@gmail.com', 25);
+INSERT INTO clientes (nome, email, idade) VALUES ('Marcos', 'Marcos@gmail.com', 29);
+INSERT INTO clientes (nome, email, idade) VALUES ('Angelo', 'Angelo@gmail.com', 47);
+INSERT INTO clientes (nome, email, idade) VALUES ('Raissa', 'Raissa@gmail.com', 33);
+INSERT INTO clientes (nome, email, idade) VALUES ('Erica', 'Erica@gmail.com', 56);
+INSERT INTO clientes (nome, email, idade) VALUES ('Vanessa', 'Vanessa@gmail.com', 19);
+INSERT INTO clientes (nome, email, idade) VALUES ('Pedro', 'Pedro@gmail.com', 27);
+--------------------------------------------------------------------------------------------
+SELECT * FROM clientes;
+--------------------------------------------------------------------------------------------
+SELECT * FROM clientes WHERE idade > 25;
+--------------------------------------------------------------------------------------------
+SELECT * FROM clientes order by nome ASC;
+--------------------------------------------------------------------------------------------
+UPDATE clientes SET email = 'Angelo47@gmail.com' WHERE nome = 'Angelo';
+--------------------------------------------------------------------------------------------
+DELETE FROM clientes WHERE id = '1';
+--------------------------------------------------------------------------------------------
+CREATE TABLE pedidos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cliente_id INTEGER,
+    valor REAL NOT NULL,
+    data_pedido DATE NOT NULL,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+);
+-------------------------------------------------------------------------------------------
+INSERT INTO pedidos (cliente_id, valor, data_pedido) VALUES
+(1, 150.00, '10-01-2025'),
+(2, 89.90, '31-03-2025'),
+(3, 200.00, '23-02-2025'),
+(4, 45.99, '11-01-2025'),
+(5, 300.00, '22-12-2024'),
+(6, 121.24, '28-12-2024'),
+(7, 75.00, '28-02-2025'),
+(8, 250.50, '22-01-2024'),
+(9, 950.00, '14-07-2024'),
+(10, 280.25, '18-09-2024');
+--------------------------------------------------------------------------------------------
+SELECT * FROM pedidos;
+--------------------------------------------------------------------------------------------
+SELECT * FROM pedidos WHERE valor > 100;
+--------------------------------------------------------------------------------------------
+SELECT COUNT(*) FROM clientes;
+--------------------------------------------------------------------------------------------
+SELECT AVG(valor) FROM pedidos;
+--------------------------------------------------------------------------------------------
+SELECT MAX(valor) FROM pedidos;
+--------------------------------------------------------------------------------------------
+SELECT * FROM pedidos WHERE cliente_id = 7;
+--------------------------------------------------------------------------------------------
+SELECT cliente_id, COUNT(*) AS quantidade_pedidos
+FROM pedidos
+GROUP BY cliente_id;
+--------------------------------------------------------------------------------------------
+SELECT cliente_id, SUM(valor) AS total_gasto
+FROM pedidos
+GROUP BY cliente_id;
+--------------------------------------------------------------------------------------------
+SELECT cliente_id, COUNT(*) AS quantidade_pedidos
+FROM pedidos
+GROUP BY cliente_id
+HAVING COUNT(cliente_id) > 1;
+--------------------------------------------------------------------------------------------
+DELETE FROM pedidos;
+--------------------------------------------------------------------------------------------
+CREATE TABLE livros (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    autor TEXT NOT NULL
+);
+--------------------------------------------------------------------------------------------
+CREATE TABLE emprestimos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    livro_id INTEGER,
+    cliente_id INTEGER,
+    data_emprestimo DATE NOT NULL,
+    FOREIGN KEY (livro_id) REFERENCES livros(id)
+);
+--------------------------------------------------------------------------------------------
+INSERT INTO livros (titulo, autor) VALUES
+('Memórias Póstumas de Brás Cubas', 'Machado de Assis'),
+('Dom Casmurro', 'Machado de Assis'),
+('Iracema', 'José de Alencar'),
+('Grande Sertão: Veredas', 'Guimarães Rosa'),
+('Morte e Vida Severina', 'João Cabral de Melo Neto');
+--------------------------------------------------------------------------------------------
+INSERT INTO emprestimos (livro_id, cliente_id, data_emprestimo) VALUES
+(1, 101, '2025-03-20'),
+(3, 102, '2025-02-10'),
+(5, 103, '2025-01-02');
+--------------------------------------------------------------------------------------------
+SELECT e.id AS emprestimo_id, l.titulo, l.autor, e.cliente_id, e.data_emprestimo
+FROM emprestimos e
+JOIN livros l ON e.livro_id = l.id;
+--------------------------------------------------------------------------------------------
+CREATE TABLE produtos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    preco REAL NOT NULL,
+    estoque INTEGER NOT NULL
+);
+--------------------------------------------------------------------------------------------
+CREATE TABLE vendas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    produto_id INTEGER,
+    quantidade INTEGER NOT NULL,
+    data_venda DATE NOT NULL
+);
+--------------------------------------------------------------------------------------------
+INSERT INTO produtos (nome, preco, estoque) VALUES
+('Notebook', 3500.00, 10),
+('Celular', 2999.99, 15),
+('Mouse', 150.00, 30),
+('Teclado', 250.00, 20),
+('Monitor', 1200.00, 12);
+--------------------------------------------------------------------------------------------
+INSERT INTO vendas (produto_id, quantidade, data_venda) VALUES
+(1, 2, '28-03-2025'),
+(3, 5, '21-02-2025'),
+(5, 1, '11-01-2025');
+--------------------------------------------------------------------------------------------
+SELECT p.nome, SUM(v.quantidade) AS total_vendido, SUM(v.quantidade * p.preco) AS total_arrecadado
+FROM vendas v
+JOIN produtos p ON v.produto_id = p.id
+GROUP BY p.nome;
