@@ -1,0 +1,184 @@
+--Criação de uma Tabela--
+CREATE TABLE client (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE,
+  age INTEGER
+  );
+  
+ --Inserindo Registros--
+ INSERT INTO client ( name, email, age) VALUES
+ ('Jorge', 'jorge@email.com.br', '19'),
+ ('Junior', 'junior@gmail.com.br', '20'),
+ ('ketelen', 'ketelen@gmail.com.br', '22'),
+ ('Livia', 'livia@gmail.com.br', '18'),
+ ('Maria', 'maria@gmail.com.br', '25'),
+ ('Ranyele', 'ranyele@gmail.com.br', '46'),
+ ('Lucas', 'lucas@gmail.com.br', '28'),
+ ('Felipe', 'felipe@gmail.com.br', '30'),
+ ('Ivan', 'ivan@gmail.com.br', '50'),
+ ('Gilson', 'gilson@gmail.com.br', '45');
+ 
+ --Selecionando Todos os Dados--
+ select * from client;
+ 
+ -- Filtrando por Idade--
+ select * from client where age >25;
+ 
+ --Ordenando Registros--
+ select * from client order by age ASC;
+ 
+ --Atualizando Dados--
+ update client SET email = 'jorge@gmail.com.br' where name = 'Jorge';
+ 
+ --Removendo um Cliente--
+ delete from client where name = 'Livia';
+ 
+ --╰(°▽°)╯Criando Outra Tabela╰(°▽°)╯--
+create table orders(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  client_id INTEGER,
+  price FLOAT NOT NULL,
+  order_date DATE NOT NULL,
+  foreign key (client_id) references client(id)
+  );
+  
+  --╰(°▽°)╯Inserindo Pedidos ╰(°▽°)╯--
+  insert into orders (client_id, price, order_date) Values
+  (1, 20.30, '2025-02-29'),
+  (2, 7.49, '2025-01-13'),
+  (3, 220.60, '2025-04-01'),
+  (4, 49.38, '2025-03-15'),
+  (5, 56.30, '2025-01-30'),
+  (6, 12.40, '2025-02-13'),
+  (7, 21.50, '2024-11-24'),
+  (8, 100.70, '2025-02-13'),
+  (9, 35.50, '2025-01-13'),
+  (10, 115.30, '2025-03-18');
+  
+  ------Parte TWO-------
+  ---Filtrando pedidos <100----
+  SELECT * FROM orders WHERE price >100;
+  
+  ----Contando Clientes----
+  SELECT COUNT (*) FROM client;
+  
+  ----Valor Médio dos Pedidos----
+  select AVG(price) FROM orders;
+  
+  ----Pedido Mais Caro----
+  select MAX(price) FROM orders;
+  
+  ----Pedidos Feitos por um Cliente----
+  select * from orders where client_id = 6;
+  
+  ----Quantidade de Pedidos por Cliente----
+  ----Aliases = c. que é apelido da tabela clientes----
+  SELECT 
+    c.id AS cliente_id, 
+    c.name AS nome_cliente, 
+    COUNT(o.id) AS total_pedidos
+FROM 
+    client AS c
+LEFT JOIN 
+    orders o ON c.id = o.client_id
+GROUP BY 
+    c.id, c.name
+ORDER BY 
+    total_pedidos DESC;
+  
+  ----Soma dos Valores de Pedidos por Cliente----
+  SELECT 
+    c.id AS cliente_id, 
+    c.name AS nome_cliente, 
+    SUM(o.price) AS total_gasto
+FROM 
+    client AS c
+LEFT JOIN 
+    orders o ON c.id = o.client_id
+GROUP BY 
+    c.id, c.name
+ORDER BY 
+    total_gasto DESC;
+    
+    ----Deletando Todos os Pedidos----
+ delete from orders;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+----livros----
+CREATE TABLE Livros (
+    ID INT AUTOINCREMENT PRIMARY KEY,
+    Titulo VARCHAR(255) NOT NULL,
+    Autor VARCHAR(255) NOT NULL
+);
+---emprestimos----
+CREATE TABLE Emprestimos (
+    ID INT AUTOINCREMENT PRIMARY KEY,
+    Livro_ID INT,
+    Cliente_ID INT,
+    Data_Emprestimo DATE NOT NULL,
+    FOREIGN KEY (Livro_ID) REFERENCES Livros(ID)
+);
+
+----inserindo livros----
+INSERT INTO Livros (Titulo, Autor) VALUES
+('O Senhor dos Anéis', 'J.R.R. Tolkien'),
+('1984', 'George Orwell'),
+('Tudo é Rio', 'Carla MAdeira'),
+('Verity', 'Collen Hoover'),
+('O Pequeno Príncipe', 'Antoine de Saint-Exupéry');
+
+----vendas----
+INSERT INTO Emprestimos (Livro_ID, Cliente_ID, Data_Emprestimo) VALUES
+(1, 101, '2023-10-01'),  -- O Senhor dos Anéis
+(2, 102, '2023-10-02'),  -- 1984
+(4, 103, '2023-10-03');  -- Verity
+
+---produtos vendidos---
+SELECT 
+    L.Titulo, L.Autor, E.Cliente_ID, E.Data_Emprestimo FROM Livros L
+JOIN 
+    Emprestimos E ON L.ID = E.Livro_ID;
+    
+SELECT * from Emprestimos;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+----cadrasto de produtos de vendas----
+create table products (
+  id INTEGER primary key AUTOINCREMENT,
+  name VARCHAR,
+  price INT NOT NULL,
+  stock INT NOT NULL
+  );
+  
+  create table sales (
+    id INTEGER primary Key AUTOINCREMENT,
+    product_id INTEGER,
+    amount_sale INT,
+    sale_date DATE NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+    );
+    
+   INSERT INTO products (name, price, stock) VALUES
+   ('refrigerante', '8,70', '56'),
+   ('cartela de ovos', '50', '40'),
+   ('monster', '9,0', '110'),
+   ('mentos', '8,70', '56');
+   
+   insert into sales (product_id, amount_sale, sale_date) values 
+     ('2','5', '2025-01-18'),
+     ('1','4', '2025-01-18'),
+     ('4', '10', '2025-01-18');
+   
+SELECT 
+    p.name,
+    SUM(s.amount_sale) AS total_sold, ----vendido----
+    SUM(s.amount_sale * p.price) AS total_collected ---arrecadação----
+FROM 
+    products AS p ---- (┬┬﹏┬┬)define apelido para a tabela products(^///^)----
+JOIN 
+    sales s ON p.id = s.product_id  ----combina as tabelas e informa q ambas possuem o msm valor (●'◡'●)----
+GROUP BY 
+    p.id, p.name;
